@@ -3,14 +3,17 @@ const { join } = require("path");
 
 const puppeteer = require("puppeteer");
 
-const { codigosCasas, codigosTerrenos } = require("./propiedades");
+// const { codigosCasas, codigosTerrenos } = require("./propiedades");
+
+// const codigosCasas = ["LR3", "LR4", "C46", "C47", "C48", "LR5", "ED4", "C49"];
+const codigosTerrenos = ["T56", "T57", "T58"];
 
 // Listar todas las carpetas en la carpeta: carpetas-de-archivos
 
 // console.log("Listar todas las carpetas en la carpeta: carpetas-de-archivos");
 
 // const carpets = readdirSync(join(__dirname, "pdfs"));
-const carpets = readdirSync(join(__dirname, "carpetas-de-archivos"));
+// const carpets = readdirSync(join(__dirname, "carpetas-de-archivos"));
 
 // Para cada carpeta, ver los archivos
 // carpets.forEach((carpet) => {
@@ -32,7 +35,10 @@ const carpets = readdirSync(join(__dirname, "carpetas-de-archivos"));
 // carpets.forEach((carpet) => {
 //   console.log(`Archivos en la carpeta: ${carpet}`);
 //   const files = readdirSync(join(__dirname, "carpetas-de-archivos", carpet));
-//   const onlyJpegFiles = files.filter((file) => file.endsWith(".jpeg"));
+//   const extensionesAFiltrar = [".jpeg", ".jpg", ".png", ".HEIC"];
+//   const onlyJpegFiles = files.filter((file) => {
+//     return extensionesAFiltrar.some((extension) => file.endsWith(extension));
+//   });
 
 //   //   A todos los archivos .jpeg, renombrar con el número de index + 1
 //   onlyJpegFiles.forEach((file, index) => {
@@ -47,75 +53,79 @@ const carpets = readdirSync(join(__dirname, "carpetas-de-archivos"));
 //   });
 // });
 
-const RUTA_CASAS = "https://aloha-documents.netlify.app/casas/";
-const RUTA_TERRENOS = "https://aloha-documents.netlify.app/terrenos/";
+// const dominio = "https://aloha-documents.netlify.app";
+const dominio = "http://localhost:4321";
+
+const RUTA_CASAS = `${dominio}/casas/`;
+const RUTA_TERRENOS = `${dominio}/terrenos/`;
 
 // Hacer fetch a cada codigo de casa, realizar una impresion como pdf y guardar el pdf en una carpeta
-codigosCasas.forEach(async (codigo) => {
-  // Iniciar el browser de puppeteer
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.goto(`${RUTA_CASAS}${codigo}`);
-  // Crear una carpeta con el nombre del codigo
-  // mkdirSync(join(__dirname, "pdfs", codigo));
-  // Imprimir la pagina como pdf
+// codigosCasas.forEach(async (codigo) => {
+//   // Iniciar el browser de puppeteer
+//   const browser = await puppeteer.launch();
+//   const page = await browser.newPage();
+//   await page.goto(`${RUTA_CASAS}${codigo}`);
+//   // Crear una carpeta con el nombre del codigo
+//   // mkdirSync(join(__dirname, "pdfs", codigo));
+//   // Imprimir la pagina como pdf
 
-  const rutaPdf = join(__dirname, "pdfs", `${codigo}.pdf`);
+//   const rutaPdf = join(__dirname, "pdfs", `${codigo}.pdf`);
 
-  await page.pdf({
-    path: rutaPdf,
-    format: "LETTER",
-    printBackground: true,
-    margin: { top: "40px", left: "40px", right: "40px" },
-    timeout: 0,
-  });
-  console.log(`Se ha creado el archivo: ${rutaPdf}`);
-
-  // Crear un archivo pdf con el nombre del codigo
-  await browser.close();
-});
-
-// const arrayDeArrayCodigosDeTerrenos20En20 = codigosTerrenos.reduce(
-//   (acc, codigo, index) => {
-//     const indexArray = Math.floor(index / 10);
-//     if (!acc[indexArray]) {
-//       acc[indexArray] = [];
-//     }
-//     acc[indexArray].push(codigo);
-//     return acc;
-//   },
-//   []
-// );
-
-// // Hacer fetch a cada codigo de casa, realizar una impresion como pdf y guardar el pdf en una carpeta
-// arrayDeArrayCodigosDeTerrenos20En20.forEach(async (codigos) => {
-//   codigos.forEach(async (codigo) => {
-//     // Iniciar el browser de puppeteer
-//     const browser = await puppeteer.launch();
-//     const page = await browser.newPage();
-//     await page.goto(`${RUTA_TERRENOS}${codigo}`, {
-//       timeout: 0,
-//     });
-//     // Crear una carpeta con el nombre del codigo
-//     // mkdirSync(join(__dirname, "pdfs", codigo));
-//     // Imprimir la pagina como pdf
-
-//     const rutaPdf = join(__dirname, "pdfs", `${codigo}.pdf`);
-
-//     await page.pdf({
-//       path: rutaPdf,
-//       format: "LETTER",
-//       printBackground: true,
-//       margin: { top: "40px", left: "40px", right: "40px" },
-//       timeout: 0,
-//     });
-//     console.log(`Se ha creado el archivo: ${rutaPdf}`);
-
-//     // Crear un archivo pdf con el nombre del codigo
-//     await browser.close();
+//   await page.pdf({
+//     path: rutaPdf,
+//     format: "LETTER",
+//     printBackground: true,
+//     margin: { top: "40px", left: "40px", right: "40px" },
+//     timeout: 0,
 //   });
-//   console.log("Se han creado los pdfs de 20 terrenos");
+
+//   console.log(`Se ha creado el archivo: ${rutaPdf}`);
+
+//   // Crear un archivo pdf con el nombre del codigo
+//   await browser.close();
 // });
+
+const arrayDeArrayCodigosDeTerrenos20En20 = codigosTerrenos.reduce(
+  (acc, codigo, index) => {
+    const indexArray = Math.floor(index / 10);
+    if (!acc[indexArray]) {
+      acc[indexArray] = [];
+    }
+    acc[indexArray].push(codigo);
+    return acc;
+  },
+  []
+);
+
+// Hacer fetch a cada codigo de casa, realizar una impresion como pdf y guardar el pdf en una carpeta
+arrayDeArrayCodigosDeTerrenos20En20.forEach(async (codigos) => {
+  codigos.forEach(async (codigo) => {
+    // Iniciar el browser de puppeteer
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.goto(`${RUTA_TERRENOS}${codigo}`, {
+      timeout: 0,
+    });
+    // Crear una carpeta con el nombre del codigo
+    // mkdirSync(join(__dirname, "pdfs", codigo));
+    // Imprimir la pagina como pdf
+
+    const rutaPdf = join(__dirname, "pdfs", `${codigo}.pdf`);
+
+    await page.pdf({
+      path: rutaPdf,
+      format: "LETTER",
+      printBackground: true,
+      margin: { top: "40px", left: "40px", right: "40px" },
+      timeout: 0,
+    });
+    console.log(`Se ha creado el archivo: ${rutaPdf}`);
+
+    // Crear un archivo pdf con el nombre del codigo
+    await browser.close();
+  });
+  console.log("Se han creado los pdfs de 20 terrenos");
+});
 
 // Para cada carpeta, copiar el pdf a la carpeta anterior
 // carpets.forEach((carpet) => {
